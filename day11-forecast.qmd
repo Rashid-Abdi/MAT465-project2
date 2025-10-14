@@ -30,10 +30,10 @@ First let's record information about what you are forecasting. For the Ecologica
 
 Please navigate to [What to Forecast](https://projects.ecoforecast.org/neon4cast-ci/targets.html) and for your theme, complete the following your team has selected:
 
-- Targets:Temperature, oxygen, chla
+- Targets: temperature, oxygen, chla
 - Duration:
 - Forecast horizon:
-- Latency:
+- Latency: 
 - Focal sites: BARC, CRAM
 
 
@@ -117,11 +117,15 @@ historical_noaa <- noaa_mean_historical(site = neon_site,
 
 YOUR TURN: Plot some NOAA environmental variables:
 ```{r}
+forecast_variable <- "temperature"
+
 noaa_measurement <- "air_temperature"
+
 
 plot_noaa(noaa_data = historical_noaa,
           measurement = noaa_measurement,
           site = neon_site)
+
 
 ```
 
@@ -134,7 +138,18 @@ TYPE YOUR RESPONSE HERE
 YOUR TURN: For each of the covariates you have identified, display the scatterplot.
 
 ```{r}
-# TYPE YOUR RESPONSE HERE
+noaa_measurement <- "air_temperature"
+
+plot_target_noaa(target_data = forecast_targets,
+                 noaa_data = historical_noaa,
+                 noaa_variable = noaa_measurement,
+                 target_variable = forecast_variable)
+
+noaa_measurement2 <- "precipitation_flux"
+plot_target_noaa(target_data = forecast_targets,
+                 noaa_data = historical_noaa,
+                 noaa_variable = noaa_measurement2,
+                 target_variable = forecast_variable)
 
 ```
 
