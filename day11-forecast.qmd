@@ -160,17 +160,14 @@ YOUR TURN: Create the formula for your (linear) regression model for the target,
 ```{r}
 # TYPE YOUR RESPONSE HERE
 
-# You will need to code this in and uncomment it
+regression_formula <- temperature ~ 1 + air_temperature
 
-# regression_formula <-   # <--- You will need to code this in and uncomment it
-
-# forecast_fit <- fit_lm_model(target_data = ### ,   # <--- fill in the correct data table
-#                             noaa_data = ### ,  # <--- fill in the correct data table
-#                             regression_equation = regression_formula)
+forecast_fit <- fit_lm_model(target_data = forecast_targets,
+                             noaa_data = historical_noaa,
+                             regression_equation = regression_formula)
 
 
-# summary(forecast_fit)
-
+summary(forecast_fit)
 
 ```
 
