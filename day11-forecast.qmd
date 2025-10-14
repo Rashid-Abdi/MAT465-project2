@@ -1,0 +1,224 @@
+---
+title: "Day 11: Using Data to Improve Forecasts"
+author: "Rashid, Meng, Jeffrey"
+format:
+  html:
+    embed-resources: true
+editor: source
+---
+
+```{r}
+#| echo: false
+#| message: false
+
+library(demodelr)
+library(tidyverse)
+
+# Source this file for helpful functions
+source('https://raw.githubusercontent.com/jmzobitz/soilflux4cast/refs/heads/main/scripts/forecast_helper_functions.R')
+
+```
+
+## Step 1: Get forecast targets
+
+First let's record information about what you are forecasting. For the Ecological Forecast challenge, "targets" refer to what you are forecasting. The Ecological Forecasting Challenge selects focal sites where forecasts are evaluate. 
+
+- "duration" is the time-step of the variable where `P1D` is a daily mean, and `P1W` is a weekly total.
+- The "forecast horizon" is the number of days-ahead that we want you to forecast.
+- The "latency" is the time between data collection and data availability in the target file
+- focal sites: are the places where (for today) we will be building models
+
+Please navigate to [What to Forecast](https://projects.ecoforecast.org/neon4cast-ci/targets.html) and for your theme, complete the following your team has selected:
+
+- Targets:Temperature, oxygen, chla
+- Duration:
+- Forecast horizon:
+- Latency:
+- Focal sites: BARC, CRAM
+
+
+Explain what the targets measure (with units!):
+
+TYPE YOUR RESPONSE HERE
+
+YOUR TURN: Load in the targets for your theme:
+
+```{r}
+forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1D/aquatics-targets.csv.gz"
+
+# then run this line to see your targets
+forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
+
+glimpse(forecast_targets)
+
+forecast_targets |> 
+  filter(site_id %in% aquatics_focal_sites) |> 
+  ggplot(aes(x = datetime, y = observation)) +
+  geom_point() +
+  facet_grid(variable~site_id, scales = "free_y") +
+  theme_bw()
+
+
+```
+
+## Step 1b: Visualizing targets
+
+YOUR TURN: For each of your forecast targets, produce the code that visualizes each target over the course of 1-2 years:
+
+```{r}
+forecast_variable <- "temperature"
+neon_site <- "BARC"
+site_year <- 2024
+
+plot_targets(target_data = forecast_targets,
+            measurement = forecast_variable,
+            site = neon_site,
+            year = site_year)
+
+forecast_variable <- "oxygen"
+
+plot_targets(target_data = forecast_targets,
+            measurement = forecast_variable,
+            site = neon_site,
+            year = site_year)
+
+forecast_variable <- "chla"
+
+plot_targets(target_data = forecast_targets,
+            measurement = forecast_variable,
+            site = neon_site,
+            year = site_year)
+
+```
+
+## Step 2: Get historical weather data
+
+The next step is to visualize the effect of environmental variables on your targets to see if there are any possible relationships to explore.  We use the historical weather data:
+
+- `air_temperature` (K)
+- `air_pressure` (Pa)
+- `relative_humidity` (proportion)
+- `surface_downwelling_longwave_flux_in_air` (W/m^2)
+- `surface_downwelling_shortwave_flux_in_air` (W/m^2) 
+- `precipitation_flux` (kg/(m^2 s))
+- `eastward_wind` (m/s)
+- `northward_wind` (m/s)
+
+YOUR TURN: Acquire the historical NOAA data for your site
+
+```{r}
+
+historical_noaa <- noaa_mean_historical(site = neon_site,
+                                        year = site_year)
+
+```
+
+## Step 2b: Visualize historical weather data
+
+YOUR TURN: Plot some NOAA environmental variables:
+```{r}
+noaa_measurement <- "air_temperature"
+
+plot_noaa(noaa_data = historical_noaa,
+          measurement = noaa_measurement,
+          site = neon_site)
+
+```
+
+What patterns do you see? How do you imagine they affect your target?
+
+TYPE YOUR RESPONSE HERE
+
+## Step 3: Explore covariates
+
+YOUR TURN: For each of the covariates you have identified, display the scatterplot.
+
+```{r}
+# TYPE YOUR RESPONSE HERE
+
+```
+
+## Step 4: Define regression model
+
+YOUR TURN: Create the formula for your (linear) regression model for the target, and then create a model structure that fits the data.
+
+```{r}
+# TYPE YOUR RESPONSE HERE
+
+# You will need to code this in and uncomment it
+
+# regression_formula <-   # <--- You will need to code this in and uncomment it
+
+# forecast_fit <- fit_lm_model(target_data = ### ,   # <--- fill in the correct data table
+#                             noaa_data = ### ,  # <--- fill in the correct data table
+#                             regression_equation = regression_formula)
+
+
+# summary(forecast_fit)
+
+
+```
+
+YOUR TURN: How would you evaluate the regression fit, especially compared to the visualization of the targets with each covariate?
+
+## Step 5: Acquire "future" forecast data
+The next thing we need to do is to define a date, and then acquire what the future NOAA forecasts from the previous day.  We make the forecasts beginning the day previous and then forecast into the future. 
+
+YOUR TURN: Select a day (preferably not recently), and then acquire the NOAA forecasts for that day:
+
+```{r}
+# TYPE YOUR RESPONSE HERE
+
+# You will need to uncomment this code
+# date_to_forecast <- "YYYY-MM-DD"    # <--- You will need to code this in and uncomment it
+# forecast_variables <- ####   # <---  This will be all the forecast variables from your regression equation. You will need to code this in and uncomment it.
+
+# future <- get_forecast_noaa(site = neon_site,
+#                             forecast_date = date_to_forecast,
+#                             met_variables = forecast_variables)
+
+# glimpse(future)
+```
+
+The output data table for `future` has the following structure:
+
+- `parameter`: ensemble member number
+- `datetime`: datetime of forecast
+- `variable`:  weather variable
+- `prediction`: forecasted value
+- `family`: class of uncertainty (ensemble)
+- `site_id`: string : NEON site ID
+- `reference_datetime`: datetime of horizon 0 (the previous day)
+
+
+## Step 6: Forecast
+Now we are ready to evaluate the future NOAA data to our forecast model.  
+
+YOUR TURN: Assuming you have all the previous steps defined, all you need to do is uncomment the appropriate code:
+
+```{r}
+# future_target <- make_prediction(noaa_future = future,
+#                                  fit_model = forecast_fit,
+#                                  target_variable = forecast_variable)
+
+# glimpse(future_target)
+```
+
+
+## Step 6b: Visualize forecasts
+Let's take a look at each of the ensemble forecasts. 
+
+YOUR TURN: Assuming you have all the previous steps defined, all you need to do is uncomment the appropriate code:
+
+```{r}
+
+# ggplot(data = future_target) +
+#   geom_line(aes(x=datetime,y=prediction,group=parameter),alpha=0.4) +
+#   ylab(forecast_variable) +
+#   ggtitle(neon_site)
+
+```
+
+YOUR TURN: How do you think your forecast does?  What happens to the spread of the forecast as time goes on?
+
+## Step 7: Evaluate Forecast (next time!)
