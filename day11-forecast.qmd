@@ -31,9 +31,9 @@ First let's record information about what you are forecasting. For the Ecologica
 Please navigate to [What to Forecast](https://projects.ecoforecast.org/neon4cast-ci/targets.html) and for your theme, complete the following your team has selected:
 
 - Targets: temperature, oxygen, chla
-- Duration:
-- Forecast horizon:
-- Latency: 
+- Duration: P1D
+- Forecast horizon:30 days
+- Latency: 3 days
 - Focal sites: BARC, CRAM
 
 
