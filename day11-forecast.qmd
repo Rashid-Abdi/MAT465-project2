@@ -49,7 +49,9 @@ forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/target
 # then run this line to see your targets
 forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
 
-glimpse(forecast_targets)
+aquatics_focal_sites <- "BARC"
+
+#glimpse(forecast_targets)
 
 forecast_targets |> 
   filter(site_id %in% aquatics_focal_sites) |> 
@@ -179,17 +181,14 @@ The next thing we need to do is to define a date, and then acquire what the futu
 YOUR TURN: Select a day (preferably not recently), and then acquire the NOAA forecasts for that day:
 
 ```{r}
-# TYPE YOUR RESPONSE HERE
+date_to_forecast <- "2024-01-01"
+forecast_variables <- "air_temperature" 
 
-# You will need to uncomment this code
-# date_to_forecast <- "YYYY-MM-DD"    # <--- You will need to code this in and uncomment it
-# forecast_variables <- ####   # <---  This will be all the forecast variables from your regression equation. You will need to code this in and uncomment it.
+future <- get_forecast_noaa(site = neon_site,
+                             forecast_date = date_to_forecast,
+                             met_variables = forecast_variables)
 
-# future <- get_forecast_noaa(site = neon_site,
-#                             forecast_date = date_to_forecast,
-#                             met_variables = forecast_variables)
-
-# glimpse(future)
+glimpse(future)
 ```
 
 The output data table for `future` has the following structure:
@@ -209,11 +208,11 @@ Now we are ready to evaluate the future NOAA data to our forecast model.
 YOUR TURN: Assuming you have all the previous steps defined, all you need to do is uncomment the appropriate code:
 
 ```{r}
-# future_target <- make_prediction(noaa_future = future,
-#                                  fit_model = forecast_fit,
-#                                  target_variable = forecast_variable)
+future_target <- make_prediction(noaa_future = future,
+                                 fit_model = forecast_fit,
+                                 target_variable = forecast_variable)
 
-# glimpse(future_target)
+glimpse(future_target)
 ```
 
 
@@ -224,13 +223,15 @@ YOUR TURN: Assuming you have all the previous steps defined, all you need to do 
 
 ```{r}
 
-# ggplot(data = future_target) +
-#   geom_line(aes(x=datetime,y=prediction,group=parameter),alpha=0.4) +
-#   ylab(forecast_variable) +
-#   ggtitle(neon_site)
+ ggplot(data = future_target) +
+   geom_line(aes(x=datetime,y=prediction,group=parameter),alpha=0.4) +
+   ylab(forecast_variable) +
+   ggtitle(neon_site)
 
 ```
 
 YOUR TURN: How do you think your forecast does?  What happens to the spread of the forecast as time goes on?
+
+Our forecast is great initially but the spread quickly starts increasing, so it less precise further into the future.
 
 ## Step 7: Evaluate Forecast (next time!)
