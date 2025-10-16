@@ -222,19 +222,7 @@ The next thing we need to do is to define a date, and then acquire what the futu
 YOUR TURN: Select a day (preferably not recently), and then acquire the NOAA forecasts for that day:
 
 ```{r}
-# TYPE YOUR RESPONSE HERE
 
-# You will need to uncomment this code
-# date_to_forecast <- "YYYY-MM-DD"    # <--- You will need to code this in and uncomment it
-# forecast_variables <- ####   # <---  This will be all the forecast variables from your regression equation. You will need to code this in and uncomment it.
-
-# future <- get_forecast_noaa(site = neon_site,
-#                             forecast_date = date_to_forecast,
-#                             met_variables = forecast_variables)
-
-# glimpse(future)
-
-# You will need to uncomment this code
 date_to_forecast <- "2024-01-01"    # <--- You will need to code this in and uncomment it
 forecast_variables <- c("air_temperature", "surface_downwelling_longwave_flux_in_air")    # <---  This will be all the forecast variables from your regression equation. You will need to code this in and uncomment it.
 
