@@ -365,5 +365,6 @@ forecast_eval |>
 compute_reliability(forecast_eval)
 
 
+# The oxygen forecast at BARC showed low accuracy, precision, and reliability. Only 27 % of observed values were captured within the forecast interval, and the CRPS values indicate substantial uncertainty. The main issue is that the model used meteorological predictors suited for temperature, not oxygen. Including relevant biological and physical variables like water temperature, sunlight, and chlorophyll would significantly improve performance.
 ```
 
