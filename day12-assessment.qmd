@@ -77,6 +77,7 @@ forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/target
 
 # then run this line to see your targets
 forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
+aquatics_focal_sites <- "BARC"
 
 glimpse(forecast_targets)
 
@@ -223,8 +224,8 @@ YOUR TURN: Select a day (preferably not recently), and then acquire the NOAA for
 
 ```{r}
 
-date_to_forecast <- "2024-01-01"    # <--- You will need to code this in and uncomment it
-forecast_variables <- c("air_temperature", "surface_downwelling_longwave_flux_in_air")    # <---  This will be all the forecast variables from your regression equation. You will need to code this in and uncomment it.
+date_to_forecast <- "2024-01-01"   
+forecast_variables <- c("air_temperature", "surface_downwelling_longwave_flux_in_air")
 
 future <- get_forecast_noaa(site = neon_site,
                              forecast_date = date_to_forecast,
@@ -317,7 +318,9 @@ compute_reliability(forecast_eval)
 
 - A recommendation of how to improve forecast accuracy, precision, and reliability.
 ```{r}
+#The confidence interval in this forecast is too wide, indicating high uncertainty. I recommend reducing Initial Conditions Uncertainty by collecting more recent and frequent lake temperature observations before running the forecast. This would provide a more accurate starting point and narrow the confidence interval over time.
 
+#Another way to improve this forecast is to include additional meteorological drivers like solar radiation, wind speed, and humidity. This would reduce process uncertainty by allowing the model to better represent how environmental factors influence lake temperature.
 ```
 
 
@@ -325,6 +328,42 @@ compute_reliability(forecast_eval)
 
 Now choose either (1) a new forecast target variable or (2) new timeperiod to generate a forecast.  Evaluate your forecast based on the evaluation metrics we discussed in class.
 ```{r}
+
+future_target <- make_prediction(noaa_future = future,
+                                  fit_model = forecast_fit,
+                                  target_variable = forecast_variable2)
+ggplot(data = future_target) +
+  geom_line(aes(x=datetime,y=prediction,group=parameter),alpha=0.4) +
+  ylab(forecast_variable) +
+  ggtitle(neon_site)
+
+#compute_forecast_stats
+forecast_future <- future_target
+forecast_eval <- compute_forecast_stats(future_target,forecast_targets)
+
+glimpse(forecast_eval)
+
+forecast_name <- forecast_eval$variable |> unique()
+site_name <- forecast_eval$site_id |> unique()
+
+forecast_eval |>
+  ggplot(aes(x=datetime)) +
+  geom_line(aes(y=q0.5)) +
+  geom_ribbon(aes(ymin=q0.025,ymax=q0.975),alpha=0.3) +
+  geom_point(aes(y=observation)) +
+  ylab(forecast_name) +
+  ggtitle(site_name)
+
+forecast_eval |>
+  mutate(horizon = as.numeric(as_date(datetime) - as_date(reference_datetime)) ) |>
+  ggplot(aes(x=horizon,y=crps)) +
+  geom_point() +
+  geom_line() +
+  ggtitle(site_name) +
+  xlab("Forecast horizon (days)")
+
+compute_reliability(forecast_eval)
+
 
 ```
 
