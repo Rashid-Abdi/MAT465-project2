@@ -1,0 +1,81 @@
+---
+title: "Day 13: Iterative Forecasting and Process Models"
+author: "YOUR GROUP NAMES HERE"
+format:
+  html:
+    embed-resources: true
+editor: source
+---
+
+```{r}
+#| echo: false
+#| message: false
+
+# Load up libraries and functions:
+library(tidyverse)
+library(broom)  # You may need to install this package
+
+# Source this file for helpful functions
+source('https://raw.githubusercontent.com/jmzobitz/soilflux4cast/refs/heads/main/scripts/forecast_helper_functions.R')
+
+```
+
+
+
+## YOUR TURN: Analyzing uncertainty
+**NOTE:** This assignment builds off Days 11 - 12 and work done in class on Day 13.  Using your model and covariates:
+
+- Compute the process uncertainty.
+- Identify the parameter uncertainty.
+- Using the target and the information provided in class, what is the initial condition uncertainty?
+
+
+To do this, you can copy and paste your code from previous assignments, adding in the necessary steps above.  Explain your results outside of the code chunk.
+
+Now re-run your forecast including all the uncertainty.  Compare your forecast from Day 12 (show the forecast plot) to the new one where uncertainty is included.  How did it change / improve / worsen?
+```{r}
+forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/targets/project_id=neon4cast/duration=P1D/aquatics-targets.csv.gz"
+
+# then run this line to see your targets
+
+forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
+
+site_year <- 2024
+historical_noaa <- noaa_mean_historical(site = neon_site,
+                                        year = site_year)
+
+forecast_variable <- "temperature"
+
+noaa_measurement <- "air_temperature"
+
+
+
+regression_formula <- temperature ~ 1 + air_temperature
+
+forecast_fit <- fit_lm_model(target_data = forecast_targets,
+                             noaa_data = historical_noaa,
+                             regression_equation = regression_formula)
+
+
+summary(forecast_fit)
+
+broom::augment(forecast_fit)|>
+  summarize(sd_process=sd(.resid))
+```
+
+
+## YOUR TURN: Expand your forecast!
+
+Now choose either:
+
+(1) a new forecast target variable
+(2) a new timeperiod to generate a forecast
+(3) parameterize your model over a different timeperiod
+(4) a new site to forecast
+
+Rerun all model steps, analyze the different levels of uncertainty, and evaluate your forecast based on the evaluation metrics we discussed in Day 12.
+
+## YOUR TURN: Process models
+In class I showed a prompt that explores a possible process model. Copy and paste your prompt with the results below (make sure there are citations!)
+
+
