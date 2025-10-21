@@ -19,7 +19,7 @@ forecast_model <- function(air_temperature,
                            uncertainty = FALSE) {
 
   # Enter in all parameters:
-  p1 <- 241.68694
+  p1 <- -241.68694
   p2 <- 0.90317 ## <-- include the value here
   
   
@@ -72,5 +72,5 @@ your_forecasts |>
   geom_ribbon(aes(ymin=q0.025,ymax=q0.975),alpha=0.3) +
   geom_point(aes(y=observation)) +
   ylab(target_name) +
-  ggtitle(site_name)
+  ggtitle(neon_site)
 
