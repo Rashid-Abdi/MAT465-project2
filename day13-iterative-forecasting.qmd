@@ -68,7 +68,7 @@ future_target <- future |>
   group_by(parameter) |> # This is the ensemble value
   nest() |>
   mutate(data = map(.x=data,.f=~mutate(.x,
-                                       prediction = lm_model(air_temperature,uncertainty = TRUE) 
+                                       prediction = lm_model(air_temperature,uncertainty = FALSE) 
   )
   )
   ) |>
@@ -131,7 +131,8 @@ future_target$prediction <- future_target$prediction + rnorm(n_obs,sd = process_
 ggplot(data = future_target) +
   geom_line(aes(x=datetime,y=prediction,group=parameter),alpha=0.4)
 ```
-
+**COMPARISON OF DAY 12 and DAY 13 FORECASTS**
+In our Day 12 forecast plot, the lines were more tightly grouped together, showing a higher confidence in the model's prediction. The y-axis ranged from 0 to 30 degrees Celsius, and during the initial couple of days into the forecast, there was very little variation leading to a very tight clump of lines. However, as time went on the forecast began to become less certain. By contrast, our Day 13 forecast displayed a much larger number of simulated prediction lines. This is because the additional lines represent the forecast uncertainty. The y-axis range expanded slightly, as the additional lines produced both higher and lower values than the ones given on Day 12. Similarly to day 12, tight clustering can be seen in the inital days of the forecast. This is followed by an expansion of the cluster, following the idea that uncertainty grows as a forecast predicts farther into the future.
 
 ## YOUR TURN: Expand your forecast!
 
@@ -154,13 +155,13 @@ lm_model <- function(air_temperature ,
   uncertainty = TRUE) {
 
   # Enter in all parameters:
-  p1 <- -241.68694
-  p2 <- 0.90317 ## <-- include the value here
+  p1 <- -269
+  p2 <- 1.023 ## <-- include the value here
 
 
   # List each of the parameters, include the uncertainty:
-  p1_sd <- 6.16417
-  p2_sd <- 0.02088
+  p1_sd <- 11.25
+  p2_sd <- 0.04565
 
 
   if (uncertainty) {
@@ -178,7 +179,7 @@ lm_model <- function(air_temperature ,
 
 # Now run the model at each location:
 neon_site="BARC"
-date_to_forecast <- "2024-07-01"
+date_to_forecast <- "2024-01-01"
 forecast_variables <- "air_temperature" 
 
 future <- get_forecast_noaa(site = neon_site,
@@ -191,7 +192,7 @@ future_target <- future |>
   group_by(parameter) |> # This is the ensemble value
   nest() |>
   mutate(data = map(.x=data,.f=~mutate(.x,
-                                       prediction = lm_model(air_temperature,uncertainty = TRUE) 
+                                       prediction = lm_model(air_temperature,uncertainty = FALSE) 
   )
   )
   ) |>
@@ -246,5 +247,216 @@ ggplot(data = future_target) +
 
 ## YOUR TURN: Process models
 In class I showed a prompt that explores a possible process model. Copy and paste your prompt with the results below (make sure there are citations!)
+
+**Prompt: **What is a process model for water temperature with air temperature as a model input
+
+**Gemini Pro:**  
+---
+
+### **A Process Model for Temperature with Air Temperature and Downwelling Longwave Flux**
+
+A process model for temperature that uses **air temperature** and **surface downwelling longwave flux** as inputs is based on the physical principle of **surface energy balance**. This model calculates the temperature of the Earth's surface by ensuring that all energy inputs and outputs at the surface are equal.  
+---
+
+### **The Core Concept: Surface Energy Balance 🌡️**
+
+The model's foundation is the surface energy balance equation, which states that the net radiation at the surface must be balanced by the other energy fluxes.  
+The equation is:  
+Rn \= H \+ LE \+ G
+
+* **Rn** is the **Net Radiation**: The total energy available from all forms of radiation.  
+* **H** is the **Sensible Heat Flux**: Heat exchanged between the surface and the air through convection and conduction.  
+* **LE** is the **Latent Heat Flux**: Energy used to evaporate water (a process also known as evapotranspiration).  
+* **G** is the **Ground Heat Flux**: Heat conducted into the soil or subsurface.
+
+The model works by solving for the **surface temperature (Ts)** that makes this equation balance.  
+*(Suggestion: Insert a diagram of the Earth's surface energy balance here for visual context.)*  
+---
+
+### **How Your Inputs Drive the Model**
+
+Your two specified inputs are essential for calculating the key terms in the energy balance equation.
+
+#### **1\. Surface Downwelling Longwave Flux (L↓)**
+
+This input is a crucial component of **Net Radiation (Rn)**. It represents the thermal energy radiated downwards from the atmosphere (by clouds, water vapor, etc.) that warms the surface.
+
+* Role: It is a direct energy input in the net radiation calculation:  
+  Rn \= (Incoming Shortwave \- Outgoing Shortwave) \+ (L↓ \- L↑)  
+* **Context**: The outgoing longwave radiation (L↑) is emitted by the surface itself and is calculated using the surface temperature (Ts) in the Stefan-Boltzmann law: L↑ \= ε \* σ \* Ts^4.
+
+Your downwelling longwave flux input directly determines a major part of the energy gained by the surface.
+
+#### **2\. Air Temperature (Ta)**
+
+This input is the primary driver of the **Sensible Heat Flux (H)**, which is the heat transfer between the surface and the air caused by their temperature difference.
+
+* Role: It sets the baseline for heat exchange with the atmosphere. The calculation is:  
+  H \= ρ \* cp \* (Ts \- Ta) / ra  
+* **Context**: If the surface is warmer than the air (Ts \> Ta), heat flows from the surface to the atmosphere, cooling the surface. If the air is warmer, the surface gains heat. The variables ρ, cp, and ra represent air density, the specific heat of air, and aerodynamic resistance (related to wind), respectively.
+
+**ChatGPT:**
+
+---
+
+## **Process Model for Temperature with Air Temperature and Surface Downwelling Longwave Flux as Inputs**
+
+### **1\. Overview**
+
+A **process model** for temperature aims to predict a temperature variable (e.g., surface temperature) based on environmental drivers. In this case, the covariates are:
+
+* **Air Temperature (T\_air)**: The temperature of the air near the surface.
+
+* **Surface Downwelling Longwave Radiation (L↓)**: Longwave radiation emitted downward by the atmosphere, which warms the surface.
+
+---
+
+### **2\. Model Output**
+
+The goal is to model a temperature variable, such as **surface temperature (T\_surface)**, as a function of the above inputs.
+
+---
+
+### **3\. Types of Process Models**
+
+#### **a. Empirical (Statistical) Model**
+
+A basic linear regression model might look like:
+
+T\_surface(t) \= β0 \+ β1 \* T\_air(t) \+ β2 \* L↓(t) \+ ε(t)
+
+Where:
+
+* β0, β1, β2 are regression coefficients.
+
+* ε(t) is a random error term.
+
+* t denotes the time step (e.g., hourly, daily).
+
+This can be extended to nonlinear models using methods like Random Forests or Neural Networks.
+
+---
+
+#### **b. Mechanistic (Physical) Model**
+
+A more physics-based approach uses the surface energy balance:
+
+C \* dT\_surface/dt \= Rn \- H \- LE \- G
+
+Where:
+
+* C \= heat capacity of the surface
+
+* Rn \= net radiation
+
+* H \= sensible heat flux
+
+* LE \= latent heat flux
+
+* G \= ground heat flux
+
+Net radiation (Rn) is calculated as:
+
+Rn \= L↓ \- L↑ \+ S↓ \- S↑
+
+In this context:
+
+* L↓ \= downwelling longwave radiation (input)
+
+* T\_air affects H (sensible heat exchange with air)
+
+---
+
+#### **c. Hybrid Model (Physics \+ Data)**
+
+You can also create a data-driven model informed by physics. For example:
+
+T\_surface(t+1) \= T\_surface(t) \+ Δt \* f(T\_air(t), L↓(t))
+
+Where `f` is a learned function (e.g., from a neural network), and Δt is the time step.
+
+---
+
+### **4\. Implementation Tips**
+
+* Ensure consistent units:
+
+  * Temperature in °C or K
+
+  * Radiation in W/m²
+
+* Match the model to your time resolution (hourly, daily, etc.).
+
+* Consider lagged variables if thermal inertia (e.g., in soil) is significant.
+
+---
+
+### **Summary**
+
+To model surface temperature as a function of:
+
+* **T\_air** (Air Temperature)
+
+* **L↓** (Downwelling Longwave Radiation)
+
+You can use:
+
+**Empirical models**:
+
+ T\_surface \= β0 \+ β1 \* T\_air \+ β2 \* L↓
+
+1.   
+2. **Physical models** (energy balance equations)
+
+3. **Hybrid models** (data-driven with physical structure)
+
+---
+
+**Claude Sonnet 4.5:**
+
+**A process model for water temperature with air temperature as input typically represents the physical heat transfer mechanisms between the atmosphere and a water body. Here are the main approaches:**
+
+## **Simple Energy Balance Model**
+
+**The most fundamental process model is based on heat flux balance:**
+
+**dT\_w/dt \= (Q\_net) / (ρ\_w × c\_p × h)**
+
+**Where:**
+
+* **T\_w \= water temperature**  
+* **Q\_net \= net heat flux at the water surface**  
+* **ρ\_w \= water density**  
+* **c\_p \= specific heat capacity of water**  
+* **h \= water depth (for well-mixed systems)**
+
+## **Heat Flux Components**
+
+**Q\_net includes several terms driven by air temperature:**
+
+1. **Shortwave radiation (Q\_s): Solar radiation (partially dependent on cloud cover, which correlates with air temperature)**  
+2. **Longwave radiation (Q\_l): Both incoming atmospheric radiation (function of air temperature) and outgoing water surface radiation (function of water temperature):**  
+   * **Q\_l,in ∝ εσT\_a⁴**  
+   * **Q\_l,out ∝ εσT\_w⁴**  
+3. **Sensible heat flux (Q\_h): Heat transfer due to temperature difference:**  
+   * **Q\_h \= f(wind) × (T\_a \- T\_w)**  
+4. **Latent heat flux (Q\_e): Heat loss from evaporation, influenced by vapor pressure difference which depends on both air and water temperatures**
+
+## **Simplified Regression Approach**
+
+**For practical applications, empirical models are common:**
+
+**T\_w(t) \= α × T\_a(t) \+ β × T\_w(t-1) \+ γ**
+
+**This autoregressive form captures the thermal inertia of water while using air temperature as the primary driver.**
+
+## **Equilibrium Temperature Model**
+
+**Another approach uses the concept that water temperature tends toward an equilibrium with air temperature:**
+
+**dT\_w/dt \= K × (T\_eq \- T\_w)**
+
+**Where T\_eq is a function of air temperature and other meteorological variables.**
+
 
 

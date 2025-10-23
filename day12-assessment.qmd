@@ -77,7 +77,7 @@ forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/target
 
 # then run this line to see your targets
 forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
-aquatics_focal_sites <- "BARC"
+aquatics_focal_sites <- "CRAM"
 
 glimpse(forecast_targets)
 
@@ -96,7 +96,7 @@ YOUR TURN: For each of your forecast targets, produce the code that visualizes e
 ```{r}
 # TYPE YOUR RESPONSE HERE
 forecast_variable <- "temperature"
-neon_site <- "BARC"
+neon_site <- "CRAM"
 site_year <- 2024
 
 plot_targets(target_data = forecast_targets,
