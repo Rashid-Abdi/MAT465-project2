@@ -49,12 +49,12 @@ forecast_url <- "https://sdsc.osn.xsede.org/bio230014-bucket01/challenges/target
 # then run this line to see your targets
 forecast_targets <- read_csv(forecast_url, show_col_types = FALSE)
 
-aquatics_focal_sites <- "BARC"
+aquatics_focal_sites <- c("BARC", "CRAM")
 
 #glimpse(forecast_targets)
 
 forecast_targets |> 
-  filter(site_id %in% aquatics_focal_sites) |> 
+  filter(site_id %in% aquatics_focal_sites, variable == "temperature" ) |> 
   ggplot(aes(x = datetime, y = observation)) +
   geom_point() +
   facet_grid(variable~site_id, scales = "free_y") +
@@ -121,7 +121,7 @@ YOUR TURN: Plot some NOAA environmental variables:
 ```{r}
 forecast_variable <- "temperature"
 
-noaa_measurement <- "air_temperature"
+noaa_measurement <- "surface_downwelling_longwave_flux_in_air"
 
 
 plot_noaa(noaa_data = historical_noaa,

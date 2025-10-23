@@ -96,7 +96,7 @@ YOUR TURN: For each of your forecast targets, produce the code that visualizes e
 ```{r}
 # TYPE YOUR RESPONSE HERE
 forecast_variable <- "temperature"
-neon_site <- "CRAM"
+neon_site <- "BARC"
 site_year <- 2024
 
 plot_targets(target_data = forecast_targets,
